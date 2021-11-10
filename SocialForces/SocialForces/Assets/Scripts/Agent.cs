@@ -106,7 +106,19 @@ public class Agent : MonoBehaviour
     
     private Vector3 CalculateGoalForce()
     {
-        return Vector3.zero;
+        var e = path[0] - transform.position;
+
+        Vector3 denominator = new Vector3();
+        denominator.x = rb.velocity.x * e.x - rb.velocity.x;
+        denominator.y = rb.velocity.y * e.y - rb.velocity.y;
+
+        Vector3 forceG = new Vector3();
+
+        forceG = rb.mass* (denominator / Time.deltaTime);
+
+        return forceG;
+        
+        //return Vector3.zero;
     }
 
     private Vector3 CalculateAgentForce()
@@ -135,7 +147,7 @@ public class Agent : MonoBehaviour
         }
         else if (WallManager.IsWall(other.gameObject))
         {
-            perceivedWalls.Add(other.gameObejct);
+            //perceivedWalls.Add(other.gameObejct);
         }
     }
     
@@ -147,7 +159,7 @@ public class Agent : MonoBehaviour
         }
         else if (WallManager.IsWall(other.gameObject))
         {
-            perceivedWalls.Remove(other.gameObejct);
+            //perceivedWalls.Remove(other.gameObejct);
         }
     }
 
