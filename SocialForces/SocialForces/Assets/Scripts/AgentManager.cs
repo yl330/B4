@@ -51,7 +51,11 @@ public class AgentManager : MonoBehaviour
     void Update()
     {
         #region Visualization
-        
+        if (Input.GetMouseButton(1))
+        {
+            print("Move");
+            MouseClickCheck();
+        }
         if (Input.GetMouseButtonDown(0))
         {
             if (true)
@@ -87,6 +91,7 @@ public class AgentManager : MonoBehaviour
 
         #endregion
     }
+
 
     IEnumerator Run()
     {
@@ -165,4 +170,19 @@ public class AgentManager : MonoBehaviour
     }
 
     #endregion
+
+    void MouseClickCheck()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hitInfo;
+
+        if (!Physics.Raycast(ray, out hitInfo))
+        {
+            return;
+        }
+
+        //NavMeshHit navHitInfo;
+        destination = hitInfo.point;
+        SetAgentDestinations(hitInfo.point);
+    }
 }
