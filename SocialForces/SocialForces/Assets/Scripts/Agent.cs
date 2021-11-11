@@ -109,9 +109,11 @@ public class Agent : MonoBehaviour
 
     private Vector3 ComputeForce()
     {
-
-        var force = CalculateGoalForce()+CalculateAgentForce();
-
+        var force = Vector3.zero;
+        if (click) {
+            force = CalculateGoalForce() + CalculateAgentForce();
+        }
+       
         if (force != Vector3.zero)
         {
             return force.normalized * Mathf.Min(force.magnitude, Parameters.maxSpeed);
@@ -143,6 +145,7 @@ public class Agent : MonoBehaviour
 
     private Vector3 CalculateAgentForce()
     {
+
         Vector3 force=new Vector3(0f,0f,0f);
         float R_ij = 2 * radius;
         float Ai = Parameters.A;
