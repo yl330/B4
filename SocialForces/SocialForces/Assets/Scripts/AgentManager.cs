@@ -54,6 +54,7 @@ public class AgentManager : MonoBehaviour
         if (Input.GetMouseButton(1))
         {
             print("Move");
+            Agent.click = true;
             MouseClickCheck();
             foreach (var agent in agents)
             {

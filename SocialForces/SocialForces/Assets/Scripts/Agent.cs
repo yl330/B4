@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -21,9 +22,15 @@ public class Agent : MonoBehaviour
 
     private HashSet<GameObject> perceivedNeighbors = new HashSet<GameObject>();
 
+    public static bool click;
+
     void Start()
     {
+<<<<<<< Updated upstream
         modify = true;
+=======
+        click = false;
+>>>>>>> Stashed changes
         path = new List<Vector3>();
         nma = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
@@ -108,7 +115,12 @@ public class Agent : MonoBehaviour
 
     private Vector3 ComputeForce()
     {
+<<<<<<< Updated upstream
         var force = CalculateGoalForce();
+=======
+       
+        var force = CalculateGoalForce()+CalculateAgentForce();
+>>>>>>> Stashed changes
 
         if (force != Vector3.zero)
         {
@@ -121,6 +133,7 @@ public class Agent : MonoBehaviour
     
     private Vector3 CalculateGoalForce()
     {
+<<<<<<< Updated upstream
         Vector3 res = new Vector3();
         if (modify)
         {
@@ -147,6 +160,24 @@ public class Agent : MonoBehaviour
         //Vector3 forceG = new Vector3();
 
         //forceG = rb.mass* (denominator / Time.deltaTime);
+=======
+        Vector3 forceG;
+        if (!click)
+        {
+            forceG = new Vector3(0.0f,0.0f,0.0f);
+            return forceG;
+        }
+
+        var e = path[0] - transform.position;
+        Vector3 denominator = new Vector3();
+        denominator.x = Parameters.maxSpeed * e.x - rb.velocity.x;
+        denominator.z = Parameters.maxSpeed * e.z - rb.velocity.z;
+        denominator.y = 0;
+
+        
+
+        forceG = rb.mass* (denominator / Parameters.T);
+>>>>>>> Stashed changes
 
         
         //return Vector3.zero;
@@ -154,7 +185,29 @@ public class Agent : MonoBehaviour
 
     private Vector3 CalculateAgentForce()
     {
-        return Vector3.zero;
+        Vector3 force=new Vector3(0f,0f,0f);
+        float R_ij = 2 * radius;
+        float Ai = Parameters.A;
+        float Bi = Parameters.B;
+        float k = Parameters.k;
+        float kappa = Parameters.Kappa;
+        foreach (var neighbor in perceivedNeighbors) {
+            Rigidbody rb_neighbor = neighbor.GetComponent<Rigidbody>();
+            float neighbor_x = neighbor.transform.position.x;
+            float x = transform.position.x;
+            float neighbor_z = neighbor.transform.position.x;
+            float z = transform.position.z;
+            float D_ij= (float)Math.Sqrt((neighbor_x - x) * (neighbor_x - x) + (neighbor_z - z) * (neighbor_z - z));
+            Vector3 N_ij = (neighbor.transform.position - transform.position) / D_ij;
+            float g = 0;
+            if (R_ij - D_ij > 0)
+                g = R_ij - D_ij;
+            Vector3 t_ij = new Vector3(-N_ij.z,0,N_ij.x);
+            float Delta_v_ji_t=Vector3.Dot(rb.velocity - rb_neighbor.velocity, t_ij);
+            Vector3 f= (Ai*(float)Math.Exp((R_ij-D_ij)/Bi)+k*g) * N_ij + kappa * g * Delta_v_ji_t * t_ij;
+            force += f;
+        }
+        return force;
     }
 
     private Vector3 CalculateWallForce()
