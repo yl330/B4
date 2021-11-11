@@ -21,6 +21,7 @@ public class Agent : MonoBehaviour
 
 
     private HashSet<GameObject> perceivedNeighbors = new HashSet<GameObject>();
+    private HashSet<GameObject> perceivedWalls = new HashSet<GameObject>();
 
     public static bool click;
 
@@ -35,7 +36,7 @@ public class Agent : MonoBehaviour
         gameObject.transform.localScale = new Vector3(2 * radius, 1, 2 * radius);
         nma.radius = radius;
         rb.mass = mass;
-        GetComponent<SphereCollider>().radius = perceptionRadius / 2;
+        GetComponent<SphereCollider>().radius = perceptionRadius / 5;
     }
 
     private void Update()
@@ -111,7 +112,7 @@ public class Agent : MonoBehaviour
     {
         var force = Vector3.zero;
         if (click) {
-            force = CalculateGoalForce() + CalculateAgentForce();
+            force = CalculateGoalForce() + CalculateAgentForce()+ CalculateWallForce();
         }
        
         if (force != Vector3.zero)
@@ -126,12 +127,6 @@ public class Agent : MonoBehaviour
     private Vector3 CalculateGoalForce()
     {
         Vector3 forceG;
-        if (!click)
-        {
-            forceG = new Vector3(0.0f,0.0f,0.0f);
-            return forceG;
-        }
-
         var e = path[0] - transform.position;
         Vector3 denominator = new Vector3();
         denominator.x = Parameters.maxSpeed * e.x - rb.velocity.x;
@@ -173,7 +168,30 @@ public class Agent : MonoBehaviour
 
     private Vector3 CalculateWallForce()
     {
-        return Vector3.zero;
+        Vector3 force = new Vector3(0f, 0f, 0f);
+        float R_i = radius;
+        float Ai = Parameters.A;
+        float Bi = Parameters.B;
+        float k = Parameters.k;
+        float kappa = Parameters.Kappa;
+        foreach (var wall in perceivedWalls)
+        {
+            Rigidbody rb_wall = wall.GetComponent<Rigidbody>();
+            float wall_x = wall.transform.position.x;
+            float x = transform.position.x;
+            float wall_z = wall.transform.position.x;
+            float z = transform.position.z;
+            float D_iw = (float)Math.Sqrt((wall_x - x) * (wall_x - x) + (wall_z - z) * (wall_z - z));
+            Vector3 N_iw = (wall.transform.position - transform.position) / D_iw;
+            float g = 0;
+            if (R_i - D_iw > 0)
+                g = R_i - D_iw;
+            Vector3 t_iw = new Vector3(-N_iw.z, 0, N_iw.x);
+            Vector3 vi = rb.velocity;
+            Vector3 f = (Ai * (float)Math.Exp((R_i - D_iw) / Bi) + k * g) * N_iw - kappa * g * Vector3.Dot(vi, t_iw)*t_iw;
+            force += f;
+        }
+        return force;
     }
 
     public void ApplyForce()
@@ -192,7 +210,7 @@ public class Agent : MonoBehaviour
         }
         else if (WallManager.IsWall(other.gameObject))
         {
-            //perceivedWalls.Add(other.gameObejct);
+            perceivedWalls.Add(other.gameObject);
         }
     }
     
@@ -204,7 +222,7 @@ public class Agent : MonoBehaviour
         }
         else if (WallManager.IsWall(other.gameObject))
         {
-            //perceivedWalls.Remove(other.gameObejct);
+            perceivedWalls.Remove(other.gameObject);
         }
     }
 

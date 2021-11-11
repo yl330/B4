@@ -15,5 +15,5 @@ public struct Parameters
     public const float WALL_k = 1.2f * 100000f;
     public const float WALL_Kappa = 2.4f * 100000f;
 
-    public const float maxSpeed = 100;
+    public const float maxSpeed = 10;
 }
