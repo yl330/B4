@@ -26,11 +26,8 @@ public class Agent : MonoBehaviour
 
     void Start()
     {
-<<<<<<< Updated upstream
         modify = true;
-=======
         click = false;
->>>>>>> Stashed changes
         path = new List<Vector3>();
         nma = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
@@ -43,7 +40,7 @@ public class Agent : MonoBehaviour
 
     private void Update()
     {
-        /*if (path.Count > 1 && Vector3.Distance(transform.position, path[0]) < 1.1f)
+        if (path.Count > 1 && Vector3.Distance(transform.position, path[0]) < 1.1f)
         {
             path.RemoveAt(0);
         } else if (path.Count == 1 && Vector3.Distance(transform.position, path[0]) < 2f)
@@ -55,15 +52,12 @@ public class Agent : MonoBehaviour
                 gameObject.SetActive(false);
                 AgentManager.RemoveAgent(gameObject);
             }
-        }*/
-        if(path[index].x==rb.position.x &&path[index].y==rb.position.y && path[index].z == rb.position.z)
-        {
-            index++;
         }
+        
         if (index == path.Capacity-1)
         {
-            //gameObject.SetActive(false);
-            //AgentManager.RemoveAgent(gameObject);
+            gameObject.SetActive(false);
+            AgentManager.RemoveAgent(gameObject);
         }
 
         #region Visualization
@@ -115,12 +109,8 @@ public class Agent : MonoBehaviour
 
     private Vector3 ComputeForce()
     {
-<<<<<<< Updated upstream
-        var force = CalculateGoalForce();
-=======
-       
+
         var force = CalculateGoalForce()+CalculateAgentForce();
->>>>>>> Stashed changes
 
         if (force != Vector3.zero)
         {
@@ -133,34 +123,6 @@ public class Agent : MonoBehaviour
     
     private Vector3 CalculateGoalForce()
     {
-<<<<<<< Updated upstream
-        Vector3 res = new Vector3();
-        if (modify)
-        {
-            return new Vector3(0.0f,0.0f,0.0f);
-        }
-        if (index == path.Capacity)
-        {
-            return Vector3.zero;
-        }
-        if (flag)
-        {
-            Vector3 direction = path[index] - rb.position;
-            res = mass * (100f * direction - rb.velocity) / 0.5f;//ime.deltaTime
-        }
-        else
-        {
-            flag = true;
-            index = 0;
-            Vector3 direction = path[index] - rb.position;
-            res = mass * (100f * direction - rb.velocity) / 0.5f;
-        }
-        return res;
-
-        //Vector3 forceG = new Vector3();
-
-        //forceG = rb.mass* (denominator / Time.deltaTime);
-=======
         Vector3 forceG;
         if (!click)
         {
@@ -174,13 +136,9 @@ public class Agent : MonoBehaviour
         denominator.z = Parameters.maxSpeed * e.z - rb.velocity.z;
         denominator.y = 0;
 
-        
-
         forceG = rb.mass* (denominator / Parameters.T);
->>>>>>> Stashed changes
 
-        
-        //return Vector3.zero;
+        return forceG;
     }
 
     private Vector3 CalculateAgentForce()

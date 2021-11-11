@@ -56,10 +56,6 @@ public class AgentManager : MonoBehaviour
             print("Move");
             Agent.click = true;
             MouseClickCheck();
-            foreach (var agent in agents)
-            {
-                agent.modify = false;
-            }
         }
         if (Input.GetMouseButtonDown(0))
         {
