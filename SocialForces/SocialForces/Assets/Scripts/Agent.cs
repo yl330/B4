@@ -173,10 +173,10 @@ public class Agent : MonoBehaviour
     {
         Vector3 force = new Vector3(0f, 0f, 0f);
         float R_i = radius;
-        float Ai = Parameters.A;
-        float Bi = Parameters.B;
-        float k = Parameters.k;
-        float kappa = Parameters.Kappa;
+        float Ai = Parameters.WALL_A;
+        float Bi = Parameters.WALL_B;
+        float k = Parameters.WALL_k;
+        float kappa = Parameters.WALL_Kappa;
         foreach (var wall in perceivedWalls)
         {
             Rigidbody rb_wall = wall.GetComponent<Rigidbody>();
