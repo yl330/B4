@@ -55,6 +55,10 @@ public class AgentManager : MonoBehaviour
         {
             print("Move");
             MouseClickCheck();
+            foreach (var agent in agents)
+            {
+                agent.modify = false;
+            }
         }
         if (Input.GetMouseButtonDown(0))
         {
@@ -135,7 +139,7 @@ public class AgentManager : MonoBehaviour
         foreach (var agent in agents)
         {
             agent.ComputePath(hit.position);
-            agent.modify = false;
+            //agent.modify = false;
         }
     }
 
