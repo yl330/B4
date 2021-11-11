@@ -112,6 +112,9 @@ public class Agent : MonoBehaviour
     {
         var force = Vector3.zero;
         if (click) {
+            //print("goal:"+CalculateGoalForce());
+            //print("agent:" + CalculateAgentForce());
+            //print("wall:" + CalculateWallForce());
             force = CalculateGoalForce() + CalculateAgentForce()+ CalculateWallForce();
         }
        
@@ -131,7 +134,7 @@ public class Agent : MonoBehaviour
         Vector3 denominator = new Vector3();
         denominator.x = Parameters.maxSpeed * e.x - rb.velocity.x;
         denominator.z = Parameters.maxSpeed * e.z - rb.velocity.z;
-        denominator.y = 0;
+        //denominator.y = 0;
 
         forceG = rb.mass* (denominator / Parameters.T);
 
@@ -158,7 +161,7 @@ public class Agent : MonoBehaviour
             float g = 0;
             if (R_ij - D_ij > 0)
                 g = R_ij - D_ij;
-            Vector3 t_ij = new Vector3(-N_ij.z,0,N_ij.x);
+            Vector3 t_ij = new Vector3(-N_ij.z,N_ij.x);
             float Delta_v_ji_t=Vector3.Dot(rb.velocity - rb_neighbor.velocity, t_ij);
             Vector3 f= (Ai*(float)Math.Exp((R_ij-D_ij)/Bi)+k*g) * N_ij + kappa * g * Delta_v_ji_t * t_ij;
             force += f;
@@ -182,11 +185,11 @@ public class Agent : MonoBehaviour
             float wall_z = wall.transform.position.x;
             float z = transform.position.z;
             float D_iw = (float)Math.Sqrt((wall_x - x) * (wall_x - x) + (wall_z - z) * (wall_z - z));
-            Vector3 N_iw = (wall.transform.position - transform.position) / D_iw;
+            Vector3 N_iw = wall.transform.position / D_iw;
             float g = 0;
             if (R_i - D_iw > 0)
                 g = R_i - D_iw;
-            Vector3 t_iw = new Vector3(-N_iw.z, 0, N_iw.x);
+            Vector3 t_iw = new Vector3(-N_iw.z,N_iw.x);
             Vector3 vi = rb.velocity;
             Vector3 f = (Ai * (float)Math.Exp((R_i - D_iw) / Bi) + k * g) * N_iw - kappa * g * Vector3.Dot(vi, t_iw)*t_iw;
             force += f;
