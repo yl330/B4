@@ -135,6 +135,7 @@ public class AgentManager : MonoBehaviour
         foreach (var agent in agents)
         {
             agent.ComputePath(hit.position);
+            agent.modify = false;
         }
     }
 

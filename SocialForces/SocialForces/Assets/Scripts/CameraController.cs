@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    private float xspeed = -0.05f; // XËÙÂÊ
-    private float yspeed = 0.1f;   // yËÙÂÊ
+    private float xspeed = -0.05f; 
+    private float yspeed = 0.1f;   
 
-    private Vector3 center; // ÊÓ½ÇÖÐÐÄµã
+    private Vector3 center; 
 
     enum RotationAxes { MouseXAndY, MouseX, MouseY }
     RotationAxes axes = RotationAxes.MouseXAndY;

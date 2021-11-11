@@ -14,10 +14,16 @@ public class Agent : MonoBehaviour
     private NavMeshAgent nma;
     private Rigidbody rb;
 
+    public bool flag;
+    private int index;
+    public bool modify;
+
+
     private HashSet<GameObject> perceivedNeighbors = new HashSet<GameObject>();
 
     void Start()
     {
+        modify = true;
         path = new List<Vector3>();
         nma = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
@@ -30,7 +36,7 @@ public class Agent : MonoBehaviour
 
     private void Update()
     {
-        if (path.Count > 1 && Vector3.Distance(transform.position, path[0]) < 1.1f)
+        /*if (path.Count > 1 && Vector3.Distance(transform.position, path[0]) < 1.1f)
         {
             path.RemoveAt(0);
         } else if (path.Count == 1 && Vector3.Distance(transform.position, path[0]) < 2f)
@@ -42,6 +48,15 @@ public class Agent : MonoBehaviour
                 gameObject.SetActive(false);
                 AgentManager.RemoveAgent(gameObject);
             }
+        }*/
+        if(path[index].x==rb.position.x &&path[index].y==rb.position.y && path[index].z == rb.position.z)
+        {
+            index++;
+        }
+        if (index == path.Capacity-1)
+        {
+            //gameObject.SetActive(false);
+            //AgentManager.RemoveAgent(gameObject);
         }
 
         #region Visualization
@@ -93,7 +108,7 @@ public class Agent : MonoBehaviour
 
     private Vector3 ComputeForce()
     {
-        var force = Vector3.zero;
+        var force = CalculateGoalForce();
 
         if (force != Vector3.zero)
         {
@@ -106,17 +121,33 @@ public class Agent : MonoBehaviour
     
     private Vector3 CalculateGoalForce()
     {
-        var e = path[0] - transform.position;
+        Vector3 res = new Vector3();
+        if (modify)
+        {
+            return new Vector3(0.0f,0.0f,0.0f);
+        }
+        if (index == path.Capacity)
+        {
+            return Vector3.zero;
+        }
+        if (flag)
+        {
+            Vector3 direction = path[index] - rb.position;
+            res = mass * (100f * direction - rb.velocity) / 0.5f;//ime.deltaTime
+        }
+        else
+        {
+            flag = true;
+            index = 0;
+            Vector3 direction = path[index] - rb.position;
+            res = mass * (100f * direction - rb.velocity) / 0.5f;
+        }
+        return res;
 
-        Vector3 denominator = new Vector3();
-        denominator.x = rb.velocity.x * e.x - rb.velocity.x;
-        denominator.y = rb.velocity.y * e.y - rb.velocity.y;
+        //Vector3 forceG = new Vector3();
 
-        Vector3 forceG = new Vector3();
+        //forceG = rb.mass* (denominator / Time.deltaTime);
 
-        forceG = rb.mass* (denominator / Time.deltaTime);
-
-        return forceG;
         
         //return Vector3.zero;
     }
