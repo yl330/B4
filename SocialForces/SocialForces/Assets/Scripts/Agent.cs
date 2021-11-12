@@ -44,7 +44,7 @@ public class Agent : MonoBehaviour
         if (path.Count > 1 && Vector3.Distance(transform.position, path[0]) < 1.1f)
         {
             path.RemoveAt(0);
-        } else if (path.Count == 1 && Vector3.Distance(transform.position, path[0]) < 2f)
+        } else if (path.Count == 1 && Vector3.Distance(transform.position, path[0]) < 1.5f)
         {
             path.RemoveAt(0);
 
@@ -115,7 +115,7 @@ public class Agent : MonoBehaviour
             //print("goal:"+CalculateGoalForce());
             //print("agent:" + CalculateAgentForce());
             //print("wall:" + CalculateWallForce());
-            force = CalculateGoalForce() + CalculateAgentForce()+ CalculateWallForce();
+            force = CalculateGoalForce() + CalculateAgentForce()+ 5*CalculateWallForce();
         }
        
         if (force != Vector3.zero)
@@ -154,14 +154,14 @@ public class Agent : MonoBehaviour
             Rigidbody rb_neighbor = neighbor.GetComponent<Rigidbody>();
             float neighbor_x = neighbor.transform.position.x;
             float x = transform.position.x;
-            float neighbor_z = neighbor.transform.position.x;
+            float neighbor_z = neighbor.transform.position.z;
             float z = transform.position.z;
             float D_ij= (float)Math.Sqrt((neighbor_x - x) * (neighbor_x - x) + (neighbor_z - z) * (neighbor_z - z));
-            Vector3 N_ij = (neighbor.transform.position - transform.position) / D_ij;
+            Vector3 N_ij = (transform.position - neighbor.transform.position) / D_ij;
             float g = 0;
             if (R_ij - D_ij > 0)
                 g = R_ij - D_ij;
-            Vector3 t_ij = new Vector3(-N_ij.z,N_ij.x);
+            Vector3 t_ij = new Vector3(-N_ij.z,0,N_ij.x);
             float Delta_v_ji_t=Vector3.Dot(rb.velocity - rb_neighbor.velocity, t_ij);
             Vector3 f= (Ai*(float)Math.Exp((R_ij-D_ij)/Bi)+k*g) * N_ij + kappa * g * Delta_v_ji_t * t_ij;
             force += f;
@@ -172,7 +172,7 @@ public class Agent : MonoBehaviour
     private Vector3 CalculateWallForce()
     {
         Vector3 force = new Vector3(0f, 0f, 0f);
-        float R_i = radius;
+        float R_i = radius+0.7f;
         float Ai = Parameters.WALL_A;
         float Bi = Parameters.WALL_B;
         float k = Parameters.WALL_k;
@@ -180,18 +180,30 @@ public class Agent : MonoBehaviour
         foreach (var wall in perceivedWalls)
         {
             Rigidbody rb_wall = wall.GetComponent<Rigidbody>();
-            float wall_x = wall.transform.position.x;
             float x = transform.position.x;
-            float wall_z = wall.transform.position.x;
             float z = transform.position.z;
+            float wall_x = wall.transform.position.x ;
+            float wall_z = wall.transform.position.z;
+            Vector3 planepos = wall.transform.position;
+            if (x >= wall_x + 0.5)
+                planepos += 1 / 2 * Vector3.right;
+            else if (x <= wall_x - 0.5)
+                planepos += 1 / 2 * Vector3.left;
+            if (z >= wall_z + 0.5)
+                planepos += 1 / 2 * Vector3.forward;
+            if (z <= wall_z - 0.5)
+                planepos += 1 / 2 * Vector3.back;
+            wall_x = planepos.x;
+            wall_z = planepos.z;
             float D_iw = (float)Math.Sqrt((wall_x - x) * (wall_x - x) + (wall_z - z) * (wall_z - z));
-            Vector3 N_iw = wall.transform.position / D_iw;
+            Vector3 N_iw;
+            N_iw = (transform.position - planepos) / D_iw;
             float g = 0;
             if (R_i - D_iw > 0)
                 g = R_i - D_iw;
-            Vector3 t_iw = new Vector3(-N_iw.z,N_iw.x);
+            Vector3 t_iw = new Vector3(-N_iw.z,0,N_iw.x);
             Vector3 vi = rb.velocity;
-            Vector3 f = (Ai * (float)Math.Exp((R_i - D_iw) / Bi) + k * g) * N_iw - kappa * g * Vector3.Dot(vi, t_iw)*t_iw;
+            Vector3 f = (Ai * (float)Math.Exp((R_i - D_iw) / Bi) + k* g) * N_iw - kappa * g * Vector3.Dot(vi, t_iw)*t_iw;
             force += f;
         }
         return force;
