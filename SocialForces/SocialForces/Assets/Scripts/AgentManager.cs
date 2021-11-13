@@ -9,9 +9,16 @@ public class AgentManager : MonoBehaviour
     public int agentCount = 10;
     public float agentSpawnRadius = 20;
     public GameObject agentPrefab;
+    public int pusueAgent = 5;
+    public int evadeAgent = 5;
     public static Dictionary<GameObject, Agent> agentsObjs = new Dictionary<GameObject, Agent>();
 
     private static List<Agent> agents = new List<Agent>();
+
+    private static List<Agent> Pagents = new List<Agent>();
+    private static List<Agent> Eagents = new List<Agent>();
+    private static List<Vector3> list = new List<Vector3>();
+
     private GameObject agentParent;
     private Vector3 destination;
 
@@ -23,9 +30,17 @@ public class AgentManager : MonoBehaviour
     void Awake()
     {
         Random.InitState(0);
+        Vector3 v1 = new Vector3(-12.8f, 1.1f, 14.3f);
+        Vector3 v2 = new Vector3(14.3f, 1.1f, 14.4f);
+        Vector3 v3 = new Vector3(14.2f, 1.1f, -13.3f);
+        Vector3 v4 = new Vector3(-14.2f, 1.1f, -13.8f);
+        list.Add(v1);
+        list.Add(v2);
+        list.Add(v3);
+        list.Add(v4);
 
         agentParent = GameObject.Find("Agents");
-        for (int i = 0; i < agentCount; i++)
+        /*for (int i = 0; i < agentCount; i++)
         {
             var randPos = new Vector3((Random.value - 0.5f) * agentSpawnRadius, 0, (Random.value - 0.5f) * agentSpawnRadius);
             NavMeshHit hit;
@@ -38,24 +53,68 @@ public class AgentManager : MonoBehaviour
             agent.transform.parent = agentParent.transform;
             var agentScript = agent.GetComponent<Agent>();
             agentScript.radius = 0.3f;// Random.Range(0.2f, 0.6f);
-            agentScript.mass = 3;
+            agentScript.mass = 1;
             agentScript.perceptionRadius = 3;
 
             agents.Add(agentScript);
             agentsObjs.Add(agent, agentScript);
+        }*/
+        for (int i = 0; i < pusueAgent; i++)
+        {
+            var randPos = new Vector3((Random.value - 0.5f) * agentSpawnRadius, 0, (Random.value - 0.5f) * agentSpawnRadius);
+            NavMeshHit hit;
+            NavMesh.SamplePosition(randPos, out hit, 10, NavMesh.AllAreas);
+            randPos = hit.position + Vector3.up;
+
+            GameObject agent = null;
+            agent = Instantiate(agentPrefab, randPos, Quaternion.identity);
+            agent.name = "PAgent " + i;
+            agent.transform.parent = agentParent.transform;
+            var agentScript = agent.GetComponent<Agent>();
+            agentScript.radius = 0.3f;// Random.Range(0.2f, 0.6f);
+            agentScript.mass = 1;
+            agentScript.perceptionRadius = 3;
+            agentScript.color = true;
+
+            Pagents.Add(agentScript);
+            agentsObjs.Add(agent, agentScript);
         }
 
+        for (int i = 0; i < evadeAgent; i++)
+        {
+            var randPos = new Vector3((Random.value - 0.5f) * agentSpawnRadius, 0, (Random.value - 0.5f) * agentSpawnRadius);
+            NavMeshHit hit;
+            NavMesh.SamplePosition(randPos, out hit, 10, NavMesh.AllAreas);
+            randPos = hit.position + Vector3.up;
+
+            GameObject agent = null;
+            agent = Instantiate(agentPrefab, randPos, Quaternion.identity);
+            
+            agent.name = "EAgent " + i;
+            agent.transform.parent = agentParent.transform;
+            var agentScript = agent.GetComponent<Agent>();
+            agentScript.radius = 0.3f;// Random.Range(0.2f, 0.6f);
+            agentScript.mass = 1;
+            agentScript.perceptionRadius = 3;
+            agentScript.color = false;
+
+            Eagents.Add(agentScript);
+            agentsObjs.Add(agent, agentScript);
+        }
+        //agentParent.GetComponent<Flocking>().agents = agents; //flocking
+        //agentParent.GetComponent<MeshDeformer>().agents = agents;
         StartCoroutine(Run());
     }
-    
+
     void Update()
     {
+        automove();
         #region Visualization
         if (Input.GetMouseButton(1))
         {
             print("Move");
-            Agent.click = true;
-            MouseClickCheck();
+            //Agent.click = true;
+            //MouseClickCheck();
         }
         if (Input.GetMouseButtonDown(0))
         {
@@ -68,7 +127,8 @@ public class AgentManager : MonoBehaviour
                 {
                     point = rcHit.point;
                 }
-            } else
+            }
+            else
             {
                 var randPos = new Vector3((Random.value - 0.5f) * agentSpawnRadius, 0, (Random.value - 0.5f) * agentSpawnRadius);
 
@@ -103,9 +163,20 @@ public class AgentManager : MonoBehaviour
             if (iterations % PATHFINDING_FRAME_SKIP == 0)
             {
                 SetAgentDestinations(destination);
+                SetPDestinations();
+                SetEDestinations();
+
             }
 
             foreach (var agent in agents)
+            {
+                agent.ApplyForce();
+            }
+            foreach (var agent in Pagents)
+            {
+                agent.ApplyForce();
+            }
+            foreach (var agent in Eagents)
             {
                 agent.ApplyForce();
             }
@@ -113,7 +184,8 @@ public class AgentManager : MonoBehaviour
             if (UPDATE_RATE == 0)
             {
                 yield return null;
-            } else
+            }
+            else
             {
                 yield return new WaitForSeconds(UPDATE_RATE);
             }
@@ -160,12 +232,13 @@ public class AgentManager : MonoBehaviour
 
     #region Utility Classes
 
-    private class Tuple<K,V>
+    private class Tuple<K, V>
     {
         public K Item1;
         public V Item2;
 
-        public Tuple(K k, V v) {
+        public Tuple(K k, V v)
+        {
             Item1 = k;
             Item2 = v;
         }
@@ -187,4 +260,65 @@ public class AgentManager : MonoBehaviour
         destination = hitInfo.point;
         SetAgentDestinations(hitInfo.point);
     }
+    void automove()
+    {
+        SetPDestinations();
+        SetEDestinations();
+    }
+
+    public void SetPDestinations()
+    {
+        //NavMeshHit hit;
+        //Vector3 destination = Eagents[0].getposition();
+        //NavMesh.SamplePosition(destination, out hit, 10, NavMesh.AllAreas);
+        Vector3 destination = new Vector3(0, 0, 0);
+        foreach (var agent in Pagents)
+        {
+            float distance = Vector3.Distance(agent.getposition(), Eagents[0].getposition());
+            foreach (var b in Eagents)
+            {
+                if(Vector3.Distance(agent.getposition(), b.getposition())<=distance)
+                {
+                    destination = b.getposition();
+                    distance = Vector3.Distance(agent.getposition(), b.getposition());
+                }
+            }
+            agent.ComputePath(destination);
+            
+        }
+    }
+    public void SetEDestinations()
+    {
+        //NavMeshHit hit;
+        //NavMesh.SamplePosition(destination, out hit, 10, NavMesh.AllAreas);
+        Vector3 destination = new Vector3(0, 0, 0);
+        Vector3 res = new Vector3(0, 0, 0);
+        foreach (var agent in Eagents)
+        {
+            float distance = Vector3.Distance(Pagents[0].getposition(), agent.getposition());
+            //agent.ComputePath(hit.position);
+            foreach (var p in Pagents)
+            {
+
+                if (Vector3.Distance(agent.getposition(), p.getposition()) < distance)
+                {
+                    destination = p.getposition();
+                    distance = Vector3.Distance(agent.getposition(), p.getposition());
+                }
+            }
+            float min = Vector3.Distance(destination, list[0]);
+            res = list[0];
+            foreach (Vector3 v in list)
+            {
+                if (Vector3.Distance(destination,v) >= min)
+                {
+                    min = Vector3.Distance(destination, v);
+                    res = v;
+                }
+            }
+            agent.ComputePath(res);
+        }
+
+    }
+
 }
