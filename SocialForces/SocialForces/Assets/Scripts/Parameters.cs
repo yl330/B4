@@ -10,11 +10,11 @@ public struct Parameters
     public const float k = 1.2f * 100000f;
     public const float Kappa = 2.4f * 100000f;
 
-    public const float WALL_A = -2000f;
+    public const float WALL_A = 2000f;
     public const float WALL_B = 0.05f;
     public const float WALL_k = 1.2f * 100000f;
     public const float WALL_Kappa = 2.4f * 100000f;
 
-    //public const float maxSpeed = 5;
-    public const float maxSpeed = 2;
+    public const float maxSpeed = 5;
+    //public const float maxSpeed = 2; for flocking
 }

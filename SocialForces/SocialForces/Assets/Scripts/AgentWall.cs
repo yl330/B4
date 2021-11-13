@@ -46,22 +46,22 @@ public class AgentWall : MonoBehaviour
         {
             path.RemoveAt(0);
         }
-        else if (path.Count == 1 && Vector3.Distance(transform.position, path[0]) < 1.5f)
-        {
-            path.RemoveAt(0);
+        //else if (path.Count == 1 && Vector3.Distance(transform.position, path[0]) < 1.5f)
+        //{
+        //    path.RemoveAt(0);
 
-            if (path.Count == 0)
-            {
-                gameObject.SetActive(false);
-                AgentManagerWall.RemoveAgent(gameObject);
-            }
-        }
+        //    if (path.Count == 0)
+        //    {
+        //        gameObject.SetActive(false);
+        //        AgentManagerWall.RemoveAgent(gameObject);
+        //    }
+        //}
 
-        if (index == path.Capacity - 1)
-        {
-            gameObject.SetActive(false);
-            AgentManagerWall.RemoveAgent(gameObject);
-        }
+        //if (index == path.Capacity - 1)
+        //{
+        //    gameObject.SetActive(false);
+        //    AgentManagerWall.RemoveAgent(gameObject);
+        //}
 
         #region Visualization
 
@@ -85,14 +85,6 @@ public class AgentWall : MonoBehaviour
             }
         }
 
-        //Vector3 direction = new Vector3();
-        //direction.x = 0 - transform.position.x;
-        //direction.z = 0 - transform.position.z;
-        //direction.y = 0;
-        //direction = Quaternion.Euler(30, 0, 0) * direction;
-
-        //float distance = Parameters.maxSpeed * Time.deltaTime;
-        //transform.Translate(direction.normalized * distance, Space.Self);
 
         #endregion
     }

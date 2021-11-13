@@ -44,7 +44,8 @@ public class AgentManager : MonoBehaviour
             agents.Add(agentScript);
             agentsObjs.Add(agent, agentScript);
         }
-        agentParent.GetComponent<Flocking>().agents = agents;
+        //agentParent.GetComponent<Flocking>().agents = agents; //flocking
+        //agentParent.GetComponent<MeshDeformer>().agents = agents;
         StartCoroutine(Run());
     }
 

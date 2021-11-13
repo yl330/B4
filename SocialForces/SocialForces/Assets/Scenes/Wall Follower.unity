@@ -5713,6 +5713,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1231321496}
   - component: {fileID: 1231321497}
+  - component: {fileID: 1231321498}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -5749,6 +5750,22 @@ MonoBehaviour:
   agentCount: 100
   agentSpawnRadius: 30
   agentPrefab: {fileID: 5631278990405910066, guid: 58f4d67f6da00744ab6ab8a670af9f39,
+    type: 3}
+--- !u!114 &1231321498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1231321495}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 739b90a3b1e98314a8e6b5c1901afc81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallProb: 0.1
+  wallSpawnRadius: 30
+  wallPrefab: {fileID: 5188026141653362993, guid: 6f25fd65c4574f94cbed5b04513299fb,
     type: 3}
 --- !u!1 &1263568777
 GameObject:

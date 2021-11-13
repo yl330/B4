@@ -51,17 +51,17 @@ public class Agent : MonoBehaviour
 
             if (path.Count == 0)
             {
-                //gameObject.SetActive(false);
-                //AgentManager.RemoveAgent(gameObject);
+                gameObject.SetActive(false);
+                AgentManager.RemoveAgent(gameObject);
             }
         }
         
         if (index == path.Capacity-1)
         {
-            //gameObject.SetActive(false);
-            //AgentManager.RemoveAgent(gameObject);
+            gameObject.SetActive(false);
+            AgentManager.RemoveAgent(gameObject);
         }
-
+        //comment above for flocking
         #region Visualization
 
         if (false)
