@@ -57,9 +57,9 @@ public class Flocking : MonoBehaviour
         for (int i = 0; i < agents.Count; i++)
         {
             avgPos += agents[i].transform.position;
-            avgForward.x += Parameters.maxSpeed;
+            avgForward.x += Parameters.maxSpeed/2;
             //avgForward.y += Parameters.maxSpeed;
-            avgForward.z += Parameters.maxSpeed;
+            avgForward.z += Parameters.maxSpeed/2;
         }
 
         Averageposition = avgPos / agents.Count;
@@ -71,7 +71,7 @@ public class Flocking : MonoBehaviour
 
     private Vector3 CalculateAlignmentAcceleration(Agent agent)
     {
-        Vector3 pos = AverageForward / Parameters.maxSpeed;
+        Vector3 pos = AverageForward / (Parameters.maxSpeed/2);
 
         if (pos.magnitude > 1)
         {
