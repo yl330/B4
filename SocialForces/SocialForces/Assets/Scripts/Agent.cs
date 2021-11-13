@@ -14,24 +14,39 @@ public class Agent : MonoBehaviour
     private List<Vector3> path;
     private NavMeshAgent nma;
     private Rigidbody rb;
+    
 
     public bool flag;
     private int index;
     public bool modify;
-
+    public bool color;
 
     private HashSet<GameObject> perceivedNeighbors = new HashSet<GameObject>();
     private HashSet<GameObject> perceivedWalls = new HashSet<GameObject>();
 
     public static bool click;
 
+    public Vector3 getposition()
+    {
+        return rb.position;
+    }
     void Start()
     {
         modify = true;
-        click = false;
+        click = true;
         path = new List<Vector3>();
         nma = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
+        if (color)
+        {
+            MeshRenderer mesh = GetComponent<MeshRenderer>();
+            mesh.material.SetColor("_Color", Color.red);
+        }
+        else
+        {
+            MeshRenderer mesh = GetComponent<MeshRenderer>();
+            mesh.material.SetColor("_Color", Color.blue);
+        }
 
         gameObject.transform.localScale = new Vector3(2 * radius, 1, 2 * radius);
         nma.radius = radius;
@@ -50,15 +65,15 @@ public class Agent : MonoBehaviour
 
             if (path.Count == 0)
             {
-                gameObject.SetActive(false);
-                AgentManager.RemoveAgent(gameObject);
+                //gameObject.SetActive(false);
+                //AgentManager.RemoveAgent(gameObject);
             }
         }
         
         if (index == path.Capacity-1)
         {
-            gameObject.SetActive(false);
-            AgentManager.RemoveAgent(gameObject);
+            //gameObject.SetActive(false);
+            //AgentManager.RemoveAgent(gameObject);
         }
 
         #region Visualization
@@ -129,6 +144,10 @@ public class Agent : MonoBehaviour
     
     private Vector3 CalculateGoalForce()
     {
+        if (path.Count == 0)
+        {
+            return Vector3.zero;
+        }
         Vector3 forceG;
         var e = path[0] - transform.position;
         Vector3 denominator = new Vector3();
@@ -136,7 +155,7 @@ public class Agent : MonoBehaviour
         denominator.z = Parameters.maxSpeed * e.z - rb.velocity.z;
         //denominator.y = 0;
 
-        forceG = rb.mass* (denominator / Parameters.T);
+        forceG = mass* (denominator / Parameters.T);
 
         return forceG;
     }
@@ -199,6 +218,7 @@ public class Agent : MonoBehaviour
 
     public void ApplyForce()
     {
+        
         var force = ComputeForce();
         force.y = 0;
 
