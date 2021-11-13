@@ -101,10 +101,11 @@ public class AgentManager : MonoBehaviour
             Eagents.Add(agentScript);
             agentsObjs.Add(agent, agentScript);
         }
-
+        //agentParent.GetComponent<Flocking>().agents = agents; //flocking
+        //agentParent.GetComponent<MeshDeformer>().agents = agents;
         StartCoroutine(Run());
     }
-    
+
     void Update()
     {
         automove();
@@ -126,7 +127,8 @@ public class AgentManager : MonoBehaviour
                 {
                     point = rcHit.point;
                 }
-            } else
+            }
+            else
             {
                 var randPos = new Vector3((Random.value - 0.5f) * agentSpawnRadius, 0, (Random.value - 0.5f) * agentSpawnRadius);
 
@@ -182,7 +184,8 @@ public class AgentManager : MonoBehaviour
             if (UPDATE_RATE == 0)
             {
                 yield return null;
-            } else
+            }
+            else
             {
                 yield return new WaitForSeconds(UPDATE_RATE);
             }
@@ -229,12 +232,13 @@ public class AgentManager : MonoBehaviour
 
     #region Utility Classes
 
-    private class Tuple<K,V>
+    private class Tuple<K, V>
     {
         public K Item1;
         public V Item2;
 
-        public Tuple(K k, V v) {
+        public Tuple(K k, V v)
+        {
             Item1 = k;
             Item2 = v;
         }
