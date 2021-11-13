@@ -25,15 +25,16 @@ public class AgentManager : MonoBehaviour
     public const float UPDATE_RATE = 0.0f;
     private const int PATHFINDING_FRAME_SKIP = 25;
 
+    private float timecount;
     #region Unity Functions
 
     void Awake()
     {
         Random.InitState(0);
-        Vector3 v1 = new Vector3(-12.8f, 1.1f, 14.3f);
-        Vector3 v2 = new Vector3(14.3f, 1.1f, 14.4f);
-        Vector3 v3 = new Vector3(14.2f, 1.1f, -13.3f);
-        Vector3 v4 = new Vector3(-14.2f, 1.1f, -13.8f);
+        Vector3 v1 = new Vector3(-12f, 1.1f, 14f);
+        Vector3 v2 = new Vector3(14f, 1.1f, 14f);
+        Vector3 v3 = new Vector3(14f, 1.1f, -13f);
+        Vector3 v4 = new Vector3(-14f, 1.1f, -13f);
         list.Add(v1);
         list.Add(v2);
         list.Add(v3);
@@ -72,7 +73,7 @@ public class AgentManager : MonoBehaviour
             agent.transform.parent = agentParent.transform;
             var agentScript = agent.GetComponent<Agent>();
             agentScript.radius = 0.3f;// Random.Range(0.2f, 0.6f);
-            agentScript.mass = 1;
+            agentScript.mass = 100;
             agentScript.perceptionRadius = 3;
             agentScript.color = true;
 
@@ -263,7 +264,12 @@ public class AgentManager : MonoBehaviour
     void automove()
     {
         SetPDestinations();
-        SetEDestinations();
+        if (timecount == 5)
+        {
+            SetEDestinations();
+            timecount = 0;
+        }
+        timecount += Time.deltaTime;
     }
 
     public void SetPDestinations()
@@ -296,6 +302,7 @@ public class AgentManager : MonoBehaviour
         foreach (var agent in Eagents)
         {
             float distance = Vector3.Distance(Pagents[0].getposition(), agent.getposition());
+            destination = Pagents[0].getposition();
             //agent.ComputePath(hit.position);
             foreach (var p in Pagents)
             {
