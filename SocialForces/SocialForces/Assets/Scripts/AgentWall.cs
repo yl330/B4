@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Agent : MonoBehaviour
+public class AgentWall : MonoBehaviour
 {
     public float radius;
     public float mass;
@@ -13,7 +13,7 @@ public class Agent : MonoBehaviour
 
     private List<Vector3> path;
     private NavMeshAgent nma;
-    public Rigidbody rb;
+    private Rigidbody rb;
 
     public bool flag;
     private int index;
@@ -36,7 +36,7 @@ public class Agent : MonoBehaviour
         gameObject.transform.localScale = new Vector3(2 * radius, 1, 2 * radius);
         nma.radius = radius;
         rb.mass = mass;
-
+        rb.velocity = new Vector3(0.5f, 0, 0.5f);
         GetComponent<SphereCollider>().radius = perceptionRadius / 5;
     }
 
@@ -45,21 +45,22 @@ public class Agent : MonoBehaviour
         if (path.Count > 1 && Vector3.Distance(transform.position, path[0]) < 1.1f)
         {
             path.RemoveAt(0);
-        } else if (path.Count == 1 && Vector3.Distance(transform.position, path[0]) < 1.5f)
+        }
+        else if (path.Count == 1 && Vector3.Distance(transform.position, path[0]) < 1.5f)
         {
             path.RemoveAt(0);
 
             if (path.Count == 0)
             {
-                //gameObject.SetActive(false);
-                //AgentManager.RemoveAgent(gameObject);
+                gameObject.SetActive(false);
+                AgentManagerWall.RemoveAgent(gameObject);
             }
         }
-        
-        if (index == path.Capacity-1)
+
+        if (index == path.Capacity - 1)
         {
-            //gameObject.SetActive(false);
-            //AgentManager.RemoveAgent(gameObject);
+            gameObject.SetActive(false);
+            AgentManagerWall.RemoveAgent(gameObject);
         }
 
         #region Visualization
@@ -83,6 +84,15 @@ public class Agent : MonoBehaviour
                 Debug.DrawLine(transform.position, neighbor.transform.position, Color.yellow);
             }
         }
+
+        //Vector3 direction = new Vector3();
+        //direction.x = 0 - transform.position.x;
+        //direction.z = 0 - transform.position.z;
+        //direction.y = 0;
+        //direction = Quaternion.Euler(30, 0, 0) * direction;
+
+        //float distance = Parameters.maxSpeed * Time.deltaTime;
+        //transform.Translate(direction.normalized * distance, Space.Self);
 
         #endregion
     }
@@ -112,22 +122,21 @@ public class Agent : MonoBehaviour
     private Vector3 ComputeForce()
     {
         var force = Vector3.zero;
-        if (click) {
-            //print("goal:"+CalculateGoalForce());
-            //print("agent:" + CalculateAgentForce());
-            //print("wall:" + CalculateWallForce());
-            force = CalculateGoalForce() + CalculateAgentForce()+ 5*CalculateWallForce();
-        }
-       
+       // if (click)
+        //{
+            force = CalculateGoalForce() + CalculateAgentForce() + 5 * CalculateWallForce();
+       // }
+
         if (force != Vector3.zero)
         {
-            return force.normalized * Mathf.Min(force.magnitude, Parameters.maxSpeed);
-        } else
+            return force.normalized * Mathf.Min(force.magnitude, Parameters.maxSpeed/2);
+        }
+        else
         {
             return Vector3.zero;
         }
     }
-    
+
     private Vector3 CalculateGoalForce()
     {
         Vector3 forceG;
@@ -135,11 +144,11 @@ public class Agent : MonoBehaviour
         Vector3 denominator = new Vector3();
         denominator.x = Parameters.maxSpeed * e.x - rb.velocity.x;
         denominator.z = Parameters.maxSpeed * e.z - rb.velocity.z;
+        //denominator.y = 0;
 
         forceG = rb.mass * (denominator / Parameters.T);
 
         return forceG;
-        //return Vector3.zero;
     }
 
     private Vector3 CalculateAgentForce()
@@ -169,7 +178,6 @@ public class Agent : MonoBehaviour
             force += f;
         }
         return force;
-        //return Vector3.zero;
     }
 
     private Vector3 CalculateWallForce()
@@ -210,7 +218,6 @@ public class Agent : MonoBehaviour
             force += f;
         }
         return force;
-        //return Vector3.zero;
     }
 
     public void ApplyForce()
@@ -223,7 +230,7 @@ public class Agent : MonoBehaviour
 
     public void OnTriggerEnter(Collider other)
     {
-        if (AgentManager.IsAgent(other.gameObject))
+        if (AgentManagerWall.IsAgent(other.gameObject))
         {
             perceivedNeighbors.Add(other.gameObject);
         }
@@ -235,7 +242,7 @@ public class Agent : MonoBehaviour
 
     public void OnTriggerExit(Collider other)
     {
-        if (AgentManager.IsAgent(other.gameObject))
+        if (AgentManagerWall.IsAgent(other.gameObject))
         {
             perceivedNeighbors.Remove(other.gameObject);
         }
@@ -247,12 +254,12 @@ public class Agent : MonoBehaviour
 
     public void OnCollisionEnter(Collision collision)
     {
-        
+
     }
 
     public void OnCollisionExit(Collision collision)
     {
-        
+
     }
 
     #endregion

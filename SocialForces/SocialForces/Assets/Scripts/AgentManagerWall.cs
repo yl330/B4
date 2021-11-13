@@ -4,14 +4,14 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class AgentManager : MonoBehaviour
+public class AgentManagerWall : MonoBehaviour
 {
     public int agentCount = 10;
     public float agentSpawnRadius = 20;
     public GameObject agentPrefab;
-    public static Dictionary<GameObject, Agent> agentsObjs = new Dictionary<GameObject, Agent>();
+    public static Dictionary<GameObject, AgentWall> agentsObjs = new Dictionary<GameObject, AgentWall>();
 
-    private static List<Agent> agents = new List<Agent>();
+    private static List<AgentWall> agents = new List<AgentWall>();
     private GameObject agentParent;
     private Vector3 destination;
 
@@ -36,15 +36,15 @@ public class AgentManager : MonoBehaviour
             agent = Instantiate(agentPrefab, randPos, Quaternion.identity);
             agent.name = "Agent " + i;
             agent.transform.parent = agentParent.transform;
-            var agentScript = agent.GetComponent<Agent>();
+            var agentScript = agent.GetComponent<AgentWall>();
             agentScript.radius = 0.3f;// Random.Range(0.2f, 0.6f);
-            agentScript.mass = 1;
+            agentScript.mass = 3;
             agentScript.perceptionRadius = 3;
 
             agents.Add(agentScript);
             agentsObjs.Add(agent, agentScript);
         }
-        agentParent.GetComponent<Flocking>().agents = agents;
+
         StartCoroutine(Run());
     }
 
@@ -54,7 +54,7 @@ public class AgentManager : MonoBehaviour
         if (Input.GetMouseButton(1))
         {
             print("Move");
-            Agent.click = true;
+            AgentWall.click = true;
             MouseClickCheck();
         }
         if (Input.GetMouseButtonDown(0))
@@ -144,7 +144,7 @@ public class AgentManager : MonoBehaviour
 
     public static void RemoveAgent(GameObject obj)
     {
-        var agent = obj.GetComponent<Agent>();
+        var agent = obj.GetComponent<AgentWall>();
 
         agents.Remove(agent);
         agentsObjs.Remove(obj);
