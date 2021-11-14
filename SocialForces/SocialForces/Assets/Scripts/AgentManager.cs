@@ -73,7 +73,7 @@ public class AgentManager : MonoBehaviour
             agent.transform.parent = agentParent.transform;
             var agentScript = agent.GetComponent<Agent>();
             agentScript.radius = 0.3f;// Random.Range(0.2f, 0.6f);
-            agentScript.mass = 100;
+            agentScript.mass = 10;
             agentScript.perceptionRadius = 3;
             agentScript.color = true;
 
